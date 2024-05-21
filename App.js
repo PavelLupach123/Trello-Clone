@@ -94,9 +94,6 @@ class App extends Component {
 		return +$element.closest('.card').dataset.cardId;
 	}
 
-	/**
-	 * Event Handler's Action
-	 */
 	updateListTitle({ listId, value }) {
 		const lists = this.state.lists.map(list => (list.id === listId ? { ...list, title: value } : list));
 
@@ -108,7 +105,6 @@ class App extends Component {
 	}
 
 	toggleCardCreatorBtns(target) {
-		// eslint-disable-next-line no-unsafe-optional-chaining
 		const lists = toggleIsCardCreatorOpen(this.state.lists, +target.closest('.list-item')?.dataset.listId);
 
 		this.setState({ lists });
@@ -161,9 +157,6 @@ class App extends Component {
 
 		this.setState({ lists });
 	}
-
-	// because of event delegation and dynamic DOM Creation, form's focus event temporarily maintains and we can't close form ($card-creator or $list-creator)
-	// It means we have to close all creators at the same time
 	closeAllCreator() {
 		const isSomeListCardCreatorOpen = this.state.lists.filter(({ isCardCreatorOpen }) => isCardCreatorOpen).length;
 
@@ -250,13 +243,11 @@ class App extends Component {
 		document.body.removeChild($fragment);
 	}
 
-	// get Y coordinate of $elem's center
 	getYCoordinateCenter($elem) {
 		const { bottom, top } = $elem.getBoundingClientRect();
 		return (bottom - top) / 2;
 	}
 
-	// event Handlers
 	onDragstart(e) {
 		this.$dragTarget = e.target;
 
@@ -284,7 +275,6 @@ class App extends Component {
 		const $dropTarget = e.target;
 		const $dropList = $dropTarget.closest('.list-item');
 
-		// Default option to allow $element to drop
 		e.preventDefault();
 
 		if ($dropList === null) return;
@@ -292,7 +282,6 @@ class App extends Component {
 		if (this.$dragTarget.matches('.list-item')) {
 			if (this.$dragTarget === $dropList) return;
 
-			// eslint-disable-next-line max-len
 			const [prevDropFromIdx, currentDropToIdx] = [this.getListIndex(this.$dragTarget), this.getListIndex($dropList)];
 
 			this.$dragTarget.parentNode.insertBefore(
@@ -310,20 +299,13 @@ class App extends Component {
 		if (this.$dragTarget.matches('.card')) {
 			const $cardListContainer = $dropList.querySelector('.card-list-container');
 
-			// 1. there's no card in $cardListContainer
-			// 2. If $dropTarget is same with $dropList
 			if ($cardListContainer.children.length === 0 || $dropTarget === $dropList) {
 				$cardListContainer.appendChild(this.$dragTarget);
 				return;
 			}
 
-			// if drop card on list which cards exist, it would be valid only dragging over other card which is not on its own to make drag event sortable
 			if ($dropTarget === this.$dragTarget || !$dropTarget.matches('.card')) return;
 
-			// 1. mouse pointer(cursor) is above the center of $dropTarget
-			// - move $dragTarget to the front of $dropTarget
-			// 2. mouse pointer(cursor) is below the center of $dropTarget
-			// - move $dragTarget to the back of $dropTarget
 			$cardListContainer.insertBefore(
 				this.$dragTarget,
 				e.offsetY < this.getYCoordinateCenter($dropTarget) ? $dropTarget : $dropTarget.nextSibling,
@@ -361,7 +343,6 @@ class App extends Component {
 
 			const lists = moveCard({ lists: this.state.lists, cardId, prevDropFromId, currentDropToId, cardIndex });
 
-			// because of triggering dragend after drop, make setState call after push dragend event handler
 			setTimeout(() => {
 				this.setState({ lists });
 			}, 10);
@@ -373,17 +354,14 @@ class App extends Component {
 	onClick(e) {
 		if (e.target.nodeName === 'A') e.preventDefault();
 
-		// 1. click list-creator-open-btn & list-creator-close-btn
 		if (e.target.matches('.list-creator-open-btn') || e.target.matches('.list-creator-close-btn')) {
 			this.toggleListCreatorBtns();
 		}
 
-		// 2. click card-creator-open-btn & card-creator-close-btn
 		if (e.target.matches('.card-creator-open-btn') || e.target.matches('.card-creator-close-btn')) {
 			this.toggleCardCreatorBtns(e.target);
 		}
 
-		// 3. click add-list-btn
 		if (e.target.matches('.add-list-btn')) {
 			const [$textArea] = [...e.target.closest('.list-creator').children];
 
@@ -398,14 +376,10 @@ class App extends Component {
 			this.addNewList(value);
 		}
 
-		// 4. click delete-list-btn
 		if (e.target.matches('.delete-list-btn')) {
 			this.removeList(e.target);
 		}
-
-		// 5. toggle Modal
 		if (e.target.closest('.card')) {
-			// 6. click delete-card-card
 			if (e.target.matches('.delete-card-btn')) {
 				this.removeCard(e.target);
 				return;
@@ -417,8 +391,7 @@ class App extends Component {
 			this.toggleModal();
 			document.body.style.overflow = 'hidden';
 		}
-
-		// 7. close Modal
+		
 		if (e.target.matches('.modal-close-btn') || e.target.matches('.overlay')) {
 			if (this.state.modal.isCardDescCreatorOpen) {
 				this.makeModalDescriptionCautionActive(e.target);
@@ -428,26 +401,22 @@ class App extends Component {
 			this.toggleModal();
 		}
 
-		// 8. make Modal Description active
 		if (e.target.matches('.modal-card-content-textarea')) {
 			if (this.state.modal.isCardDescCreatorOpen) return;
 
 			this.toggleModalDescription(true);
 		}
 
-		// 9. close Description textarea
 		if (e.target.matches('.description-close-btn')) {
 			this.toggleModalDescription(false);
 		}
 
-		// 10. save Description
 		if (e.target.matches('.save-btn')) {
 			const { value: description } = e.target.closest('.modal-card-content').querySelector('textarea');
 
 			this.saveModalDescription(description);
 		}
 
-		// 11. if Description Textarea is active and click Modal Container, do not close Modal and induce to save description on textarea
 		if (this.state.modal.isCardDescCreatorOpen && e.target.closest('.modal-container')) {
 			if (e.target.matches('.modal-card-content-textarea') || e.target.closest('.description-control')) return;
 
@@ -460,7 +429,6 @@ class App extends Component {
 		if (e.key !== 'Enter' && e.key !== 'Escape') return;
 
 		if (e.key === 'Escape') {
-			// window 'keydown' bind Event Handler -> event propagation works
 			e.stopPropagation();
 
 			if (e.target.matches('.new-list-title')) {
@@ -530,13 +498,13 @@ class App extends Component {
 			}
 
 			if (e.target.matches('.new-card-title')) {
-				e.preventDefault(); // block new line
+				e.preventDefault();
 
 				if (value !== '') this.addCard({ target: e.target, value });
 			}
 
 			if (e.target.matches('.modal-card-title-textarea')) {
-				e.preventDefault(); // block new line
+				e.preventDefault();
 
 				const currentCardTitle = findCardTitle({
 					lists: this.state.lists,

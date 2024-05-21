@@ -3,26 +3,26 @@ const initialState = {
 	lists: [
 		{
 			id: 1,
-			title: 'Tasks to Do',
+			title: 'Завдання 1',
 			cards: [
-				{ id: 1, title: 'React', description: 'my task' },
-				{ id: 2, title: 'Angular', description: '' },
+				{ id: 1, title: '1', description: '1' },
+				{ id: 2, title: '2', description: '2' },
 			],
 			isCardCreatorOpen: false,
 		},
 		{
 			id: 2,
-			title: 'Doing Tasks',
-			cards: [{ id: 3, title: 'Algorithm', description: '' }],
+			title: 'Завдання 2',
+			cards: [{ id: 3, title: '1', description: '' }],
 			isCardCreatorOpen: false,
 		},
 		{
 			id: 3,
-			title: 'Completed Tasks',
+			title: 'Завдання 3',
 			cards: [
-				{ id: 4, title: 'HTML', description: '' },
-				{ id: 5, title: 'CSS', description: '' },
-				{ id: 6, title: 'JavaScript', description: '' },
+				{ id: 4, title: '1', description: '' },
+				{ id: 5, title: '2', description: '' },
+				{ id: 6, title: '3', description: '' },
 			],
 			isCardCreatorOpen: false,
 		},
